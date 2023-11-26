@@ -1,7 +1,7 @@
 Metadata-Version: 2.1
 Name: spark-lab
 Version: 0.0.0
-Requires-Python: >=3.12
+Requires-Python: >=3.10
 Requires-Dist: hdfs>=2.7.0
 Requires-Dist: pyspark>=3.5.0
 Provides-Extra: testing

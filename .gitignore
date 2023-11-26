@@ -1,7 +1,9 @@
 .idea/
 .vscode/
 venv/
+venv-wsl/
 __pycache__/
 build/
 dist/
 secret.txt
+.ruff_cache/

@@ -6,7 +6,9 @@ from pyspark.sql import SparkSession, functions
 def rename_columns(
     df: pyspark.sql.DataFrame, new_names: list[str]
 ) -> pyspark.sql.DataFrame:
-    return df.select([functions.col(c).alias(new_names[i]) for i, c in enumerate(df.columns)])
+    return df.select(
+        [functions.col(c).alias(new_names[i]) for i, c in enumerate(df.columns)]
+    )
 
 
 def download(
@@ -16,23 +18,48 @@ def download(
 
 
 def main() -> None:
-    spark = SparkSession.builder.getOrCreate()
+    print("A")
+    try:
+        spark = SparkSession.builder.config().getOrCreate()
+    except KeyboardInterrupt:
+        # return
+        raise KeyboardInterrupt
 
-    data_path = "hdfs://localhost:9000/user/lab/u.data"
+    data_path = "hdfs://localhost:9864/user/lab/u.data"
     data_names = ["user id", "item id", "rating", "timestamp"]
     df = rename_columns(download(spark, data_path, "\t"), data_names)
     df.show()
-
-    item_path = "hdfs://localhost:9000/user/lab/u.item"
+"""
+    item_path = "http://localhost:9870/user/lab/u.item"
     item_names = [
-        "movie id", "movie title", "release date", "video release date",
-        "IMDb URL", "unknown", "Action", "Adventure", "Animation", "Children's",
-        "Comedy", "Crime", "Documentary", "Drama", "Fantasy", "Film-Noir", "Horror",
-        "Musical", "Mystery", "Romance", "Sci-Fi", "Thriller", "War", "Western"
+        "movie id",
+        "movie title",
+        "release date",
+        "video release date",
+        "IMDb URL",
+        "unknown",
+        "Action",
+        "Adventure",
+        "Animation",
+        "Children's",
+        "Comedy",
+        "Crime",
+        "Documentary",
+        "Drama",
+        "Fantasy",
+        "Film-Noir",
+        "Horror",
+        "Musical",
+        "Mystery",
+        "Romance",
+        "Sci-Fi",
+        "Thriller",
+        "War",
+        "Western",
     ]
     df_items = rename_columns(download(spark, item_path, "|"), item_names)
     df_items.show()
-
+"""
 
 if __name__ == "__main__":
     main()
