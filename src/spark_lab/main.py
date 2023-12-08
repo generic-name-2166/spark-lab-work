@@ -18,7 +18,7 @@ def download(
 
 
 def get_json(data: dict) -> None:
-    with open("output.json") as F:
+    with open("output.json", "w") as F:
         F.write(json.dumps(data, indent=4))
 
 
@@ -27,12 +27,12 @@ def main() -> None:
     spark = SparkSession.builder.master("local").getOrCreate()
     print("Got past session")
 
-    data_path = "hdfs://localhost:9864/user/lab/u.data"
+    data_path = "hdfs://localhost:9900/user/lab/u.data"
     data_names = ["user id", "item id", "rating", "timestamp"]
     df = rename_columns(download(spark, data_path, "\t"), data_names)
     df.show()
 
-    item_path = "http://localhost:9870/user/lab/u.item"
+    item_path = "hdfs://localhost:9900/user/lab/u.item"
     item_names = [
         "movie id",
         "movie title",
