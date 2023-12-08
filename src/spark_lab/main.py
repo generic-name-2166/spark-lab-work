@@ -1,6 +1,6 @@
 import pyspark
 from pyspark.sql import SparkSession, functions
-# import json
+import json
 
 
 def rename_columns(
@@ -17,19 +17,21 @@ def download(
     return spark.read.option("delimiter", delimiter).csv(data_path)
 
 
+def get_json(data: dict) -> None:
+    with open("output.json") as F:
+        F.write(json.dumps(data, indent=4))
+
+
 def main() -> None:
-    print("A")
-    try:
-        spark = SparkSession.builder.config().getOrCreate()
-    except KeyboardInterrupt:
-        # return
-        raise KeyboardInterrupt
+    print("Start")
+    spark = SparkSession.builder.master("local").getOrCreate()
+    print("Got past session")
 
     data_path = "hdfs://localhost:9864/user/lab/u.data"
     data_names = ["user id", "item id", "rating", "timestamp"]
     df = rename_columns(download(spark, data_path, "\t"), data_names)
     df.show()
-"""
+
     item_path = "http://localhost:9870/user/lab/u.item"
     item_names = [
         "movie id",
@@ -59,7 +61,39 @@ def main() -> None:
     ]
     df_items = rename_columns(download(spark, item_path, "|"), item_names)
     df_items.show()
-"""
+
+    FILM_ID = 211 + 5
+    df_items[df_items["movie id"] == FILM_ID].show()
+
+    rat_film = (
+        df[df["item id"] == FILM_ID]
+        .groupBy("rating")
+        .agg({"timestamp": "count"})
+        .sort("rating")
+    )
+    rat_film = rat_film.select(
+        "rating", functions.col("count(timestamp)").alias("rat_film")
+    )
+
+    rat_all = df.groupBy("rating").agg({"timestamp": "count"}).sort("rating")
+    rat_all = rat_all.select(
+        "rating", functions.col("count(timestamp)").alias("rat_all")
+    )
+
+    combined_df = (
+        rat_film.join(rat_all, "rating")
+        .sort("rating")
+        .select(functions.col("rat_film"), functions.col("rat_all"))
+    )
+    combined_df.show()
+
+    dict_data = {
+        column: combined_df.select(column).rdd.flatMap(lambda x: x).collect()
+        for column in combined_df.columns
+    }
+    get_json(dict_data)
+    print(json.dumps(dict_data, indent=4))
+
 
 if __name__ == "__main__":
     main()
