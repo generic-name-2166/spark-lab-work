@@ -30,6 +30,7 @@ def main() -> None:
     data_path = "hdfs://localhost:9900/user/lab/u.data"
     data_names = ["user id", "item id", "rating", "timestamp"]
     df = rename_columns(download(spark, data_path, "\t"), data_names)
+    print("u.data table")
     df.show()
 
     item_path = "hdfs://localhost:9900/user/lab/u.item"
@@ -60,9 +61,11 @@ def main() -> None:
         "Western",
     ]
     df_items = rename_columns(download(spark, item_path, "|"), item_names)
-    df_items.show()
+    print("u.item table")
+    df_items.show(n=5)
 
     FILM_ID = 211 + 5
+    print("Target film")
     df_items[df_items["movie id"] == FILM_ID].show()
 
     rat_film = (
@@ -85,6 +88,7 @@ def main() -> None:
         .sort("rating")
         .select(functions.col("rat_film"), functions.col("rat_all"))
     )
+    print("Resulting table")
     combined_df.show()
 
     dict_data = {
@@ -92,6 +96,7 @@ def main() -> None:
         for column in combined_df.columns
     }
     get_json(dict_data)
+    print("JSON output")
     print(json.dumps(dict_data, indent=4))
 
 

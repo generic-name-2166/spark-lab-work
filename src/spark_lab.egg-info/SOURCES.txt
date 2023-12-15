@@ -3,8 +3,6 @@ pyproject.toml
 setup.cfg
 setup.py
 src/spark_lab/__init__.py
-src/spark_lab/hdfs.py
-src/spark_lab/load.py
 src/spark_lab/main.py
 src/spark_lab/py.typed
 src/spark_lab.egg-info/PKG-INFO
